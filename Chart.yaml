@@ -1,6 +1,7 @@
 apiVersion: v2
-name: gb-payroll-api
-description: A Helm chart for gb-payroll-api
+name: <application/api-name>
+description: A Helm chart for <application/api-name>
 type: application
-version: 0.0.94
-appVersion: 0.0.85
+version: 0.0.1
+appVersion: 0.0.1
+
