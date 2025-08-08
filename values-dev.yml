@@ -2,8 +2,7 @@ APP_NAME: <app-name>
 ENVIRONMENT: dev
 NAMESPACE: <app-cluster-namespace>
 ISTIO_INGRESS_NAMESPACE: "<app-cluster-ingress-namespace>"
-ISTIO_INGRESS_GATEWAY_NAME: "<app-cluster-gateway>" #need to check
-# AKV: "gbgpmdv-kv"
+ISTIO_INGRESS_GATEWAY_NAME: "<app-cluster-gateway>"
 AKV: "<app-akv>-kv"
 
 CI_NUM: <app-ci-num>
@@ -48,7 +47,7 @@ serviceEntry:
 
   akv-service-entry:
     host:
-    - <app-akv>-kv.vault.azure.net
+    - <app-akv>-kv.net
     address:
     - 10.0.0.0/24
     location: MESH_EXTERNAL
@@ -57,3 +56,4 @@ serviceEntry:
         number: 443
         protocol: HTTPS
     resolution: NONE
+
