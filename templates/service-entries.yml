@@ -1,0 +1,36 @@
+
+{{- range $key, $value := .Values.serviceEntry }}
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: {{ $key }}-se
+  namespace: {{ $.Values.NAMESPACE }}
+spec:
+  {{- if ($value.address) }}
+  addresses:
+  {{- range $value.address }}
+  - {{ quote . }}
+  {{- end }}
+  {{- end }}
+  {{- if ($value.host) }}
+  hosts:
+  {{- range $value.host }}
+  - {{ . }}
+  {{- end }}
+  {{- end }}
+  exportTo:
+  - "."
+  location: {{ $value.location | default "MESH_EXTERNAL" }}
+  {{- if ($value.ports) }}
+  ports:
+  {{- range $portname, $details := $value.ports }}
+  - name: {{ $portname }}
+    number: {{ $details.number }}
+    protocol: {{ $details.protocol }}
+  {{- end }}
+  {{- end }}
+  {{- if not ($value.address) }}
+  resolution: DNS
+  {{- end }}
+---
+{{- end }}

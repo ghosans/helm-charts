@@ -1,0 +1,19 @@
+imageRegistry: "artifactory.manulife.ca/mfc-gb-docker"
+imageRepo: <app-name>
+apiDockerTag: "{{<app-name>}}"
+
+imagePullSecrets: akspullsecret
+APP_NAME: <app-name>
+PORT: 5000
+
+
+REQUESTS:
+  MEMORY: '1Gi'
+  CPU: '250m'
+
+LIMITS:
+  MEMORY: '1Gi'
+  CPU: '750m'
+
+MINREPLICAS: 1
+MAXREPLICAS: 1

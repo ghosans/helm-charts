@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.APP_NAME }}
+  namespace: {{ $.Values.NAMESPACE }}
+  labels:
+    app: {{ .Values.APP_NAME }}
+    app.kubernetes.io/instance: {{ .Values.APP_NAME }}
+    app.kubernetes.io/managed-by: 'helm'
+  annotations:
+    app_name: {{ .Values.APP_NAME }}
+    app_comp: {{ .Values.APP_NAME }}
+    env: {{ .Values.ENVIRONMENT }}
+    app_ci_num: {{ .Values.TOP_LEVEL_CI_NUM }}
+    asi_ci_num: {{ .Values.CI_NUM }}
+    cost_center: {{ quote .Values.COST_CENTER }}
+    owning_segment: {{ .Values.OWNING_SEGMENT }}
+    sec_flag: {{ quote .Values.SEC_FLAG }}
+    pii_flag: {{ quote .Values.PII_FLAG }}
+    namespace: {{ $.Values.NAMESPACE }}
+
+    # required_metadata: 'true'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.APP_NAME }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.APP_NAME }}
+      annotations:
+        app_name: {{ .Values.APP_NAME }}
+        app_comp: {{ .Values.APP_NAME }}
+        env: {{ .Values.ENVIRONMENT }}
+        app_ci_num: {{ .Values.TOP_LEVEL_CI_NUM }}
+        asi_ci_num: {{ .Values.CI_NUM }}
+        cost_center: {{ quote .Values.COST_CENTER }}
+        owning_segment: {{ .Values.OWNING_SEGMENT }}
+        sec_flag: {{ quote .Values.SEC_FLAG }}
+        pii_flag: {{ quote .Values.PII_FLAG }}
+        required_metadata: 'true'
+    spec:
+      containers:
+        - name: {{ .Values.APP_NAME }}
+          image: {{ .Values.imageRegistry }}/{{ .Values.imageRepo }}:{{ .Values.apiDockerTag }}
+          volumeMounts:
+          - mountPath: /app/newrelic/logs
+            name: newrelic-logs
+          - mountPath: /tmp
+            name: newrelic-tmp
+          - mountPath: /app/Certs
+            name: apim-certs
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+          resources:
+            requests:
+              memory: {{ .Values.REQUESTS.MEMORY }}
+              cpu: {{ .Values.REQUESTS.CPU }}
+            limits:
+              memory: {{ .Values.LIMITS.MEMORY }}
+              cpu: {{ .Values.LIMITS.CPU }}
+          ports:
+            - containerPort: {{ .Values.PORT }}
+          {{- if or (.Values.configmap) (.Values.akvs) }}
+          env:
+            {{- range $key, $value := .Values.configmap }}
+            - name: {{ $key }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $.Values.APP_NAME }}
+                  key: {{ $key }}
+            {{- end }}
+            {{- range $key, $value := .Values.akvs }}
+            - name: {{ $key }}
+              value: {{ $value.objectname }}@azurekeyvault
+            {{- end }}
+          {{- end }}
+      imagePullSecrets:
+         - name: {{ .Values.IMAGE_PULL_SECRETS }}
+      securityContext:
+        readOnlyRootFilesystem: true
+        allowPrivilegeEscalation: false
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        capabilities:
+          drop:
+            - ALL
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+      - name: newrelic-logs
+        emptyDir:
+          sizeLimit: 500Mi
+      - name: newrelic-tmp
+        emptyDir:
+          sizeLimit: 500Mi 
+      - name: apim-certs
+        emptyDir:
+          sizeLimit: 500Mi   

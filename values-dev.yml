@@ -1,0 +1,59 @@
+APP_NAME: <app-name>
+ENVIRONMENT: dev
+NAMESPACE: <app-cluster-namespace>
+ISTIO_INGRESS_NAMESPACE: "<app-cluster-ingress-namespace>"
+ISTIO_INGRESS_GATEWAY_NAME: "<app-cluster-gateway>" #need to check
+# AKV: "gbgpmdv-kv"
+AKV: "<app-akv>-kv"
+
+CI_NUM: <app-ci-num>
+TOP_LEVEL_CI_NUM: <app-ci-num>
+OWNING_SEGMENT: can
+COST_CENTER: <app-cc>
+SEC_FLAG: false
+PII_FLAG: false
+
+PORT: 5000
+
+IMAGE_PULL_SECRETS: akspullsecret
+
+HOST: 
+ - <app-host>
+PATH: <app-endpoint>
+ 
+configmap:
+  ASPNETCORE_URLS: http://+:5000
+  ASPNETCORE_ENVIRONMENT: Development
+  PORT: 5000
+  HOSTING_ENVIRONMENT: dev
+
+
+akvs:
+  ConnectionStrings__<app>ConnString:
+    objectname: <app>cnnstring
+    keyname: <app>cnnstring
+
+serviceEntry:
+  db-service-entry:
+    host:
+    - xyz.net
+    address:
+    - 10.0.0.0./24
+    location: MESH_EXTERNAL
+    ports:
+      https:
+        number: 0000
+        protocol: TCP
+    resolution: NONE
+
+  akv-service-entry:
+    host:
+    - <app-akv>-kv.vault.azure.net
+    address:
+    - 10.0.0.0/24
+    location: MESH_EXTERNAL
+    ports:
+      https:
+        number: 443
+        protocol: HTTPS
+    resolution: NONE

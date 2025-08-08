@@ -1,0 +1,12 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: {{ .Values.APP_NAME }}
+  namespace: {{ $.Values.NAMESPACE }}
+spec:
+  action: ALLOW
+  rules:
+  - {}
+  selector:
+    matchLabels:
+      app: {{ .Values.APP_NAME }}
